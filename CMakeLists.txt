@@ -46,9 +46,9 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-include_directories(Inc Drivers/STM32F7xx_HAL_Driver/Inc Drivers/STM32F7xx_HAL_Driver/Inc/Legacy Middlewares/Third_Party/FreeRTOS/Source/include Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1 Drivers/CMSIS/Device/ST/STM32F7xx/Include Drivers/CMSIS/Include Middlewares/Third_Party/LwIP/src/include Middlewares/Third_Party/LwIP/system Middlewares/Third_Party/LwIP/src/include/netif/ppp Middlewares/Third_Party/LwIP/src/include/lwip Middlewares/Third_Party/LwIP/src/include/lwip/apps Middlewares/Third_Party/LwIP/src/include/lwip/priv Middlewares/Third_Party/LwIP/src/include/lwip/prot Middlewares/Third_Party/LwIP/src/include/netif Middlewares/Third_Party/LwIP/src/include/posix Middlewares/Third_Party/LwIP/src/include/posix/sys Middlewares/Third_Party/LwIP/system/arch Drivers/CMSIS/Include Drivers/CMSIS/Include Drivers/CMSIS/Include)
+include_directories(Inc Drivers/STM32F7xx_HAL_Driver/Inc Drivers/STM32F7xx_HAL_Driver/Inc/Legacy Middlewares/Third_Party/FreeRTOS/Source/include Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1 Drivers/CMSIS/Device/ST/STM32F7xx/Include Drivers/CMSIS/Include Middlewares/Third_Party/LwIP/src/include Middlewares/Third_Party/LwIP/system Middlewares/Third_Party/LwIP/src/include/netif/ppp Middlewares/Third_Party/LwIP/src/include/lwip Middlewares/Third_Party/LwIP/src/include/lwip/apps Middlewares/Third_Party/LwIP/src/include/lwip/priv Middlewares/Third_Party/LwIP/src/include/lwip/prot Middlewares/Third_Party/LwIP/src/include/netif Middlewares/Third_Party/LwIP/src/include/posix Middlewares/Third_Party/LwIP/src/include/posix/sys Middlewares/Third_Party/LwIP/system/arch Drivers/CMSIS/Include Drivers/CMSIS/Include Drivers/CMSIS/Include Middlewares/Third_Party/mbedTLS/include Middlewares/Third_Party/mbedTLS/include/mbedtls)
 
-add_definitions(-DUSE_HAL_DRIVER -DSTM32F746xx)
+add_definitions(-DUSE_HAL_DRIVER -DSTM32F746xx -DMBEDTLS_CONFIG_FILE="mbedtls_config.h")
 
 file(GLOB_RECURSE SOURCES "startup/*.*" "Middlewares/*.*" "Drivers/*.*" "Src/*.*")
 

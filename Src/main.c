@@ -21,11 +21,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-#include "lwip.h"
+#include "mbedtls.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "open62541.h"
+#include "cert.h"
+#include "privateKey.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,7 +58,7 @@ osThreadId_t OPC_UAHandle;
 const osThreadAttr_t OPC_UA_attributes = {
   .name = "OPC_UA",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 4096
+  .stack_size = 32768
 };
 /* USER CODE BEGIN PV */
 
@@ -106,7 +108,8 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_LWIP_Init();
+  /* Up to user define the empty MX_MBEDTLS_Init() function located in mbedtls.c file */
+
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -215,16 +218,27 @@ void SystemClock_Config(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOG_CLK_ENABLE();
+  __HAL_RCC_GPIOI_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : LED_Pin */
+  GPIO_InitStruct.Pin = LED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
 }
 
 /* USER CODE BEGIN 4 */
-
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -255,11 +269,70 @@ void StartDefaultTask(void *argument)
 void opcua_thread(void *argument)
 {
   /* USER CODE BEGIN opcua_thread */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+
+    //The default 64KB of memory for sending and receiving buffer caused problems to many users. With the code below, they are reduced to ~16KB
+    UA_UInt32 sendBufferSize = 16000;       //64 KB was too much for my platform
+    UA_UInt32 recvBufferSize = 16000;       //64 KB was too much for my platform
+    UA_UInt16 portNumber = 4840;
+
+    UA_ByteString c = UA_STRING_NULL;
+    c.data = certificate;
+    c.length = cert_len;
+
+    UA_ByteString prvKey = UA_STRING_NULL;
+    prvKey.data = privateKey;
+    prvKey.length = privateKey_len;
+
+    size_t trustListSize = 0;
+    UA_ByteString *trustList = NULL;
+
+    size_t issuerListSize = 0;
+    UA_ByteString *issuerList = NULL;
+
+    size_t revocationListSize = 0;
+    UA_ByteString *revocationList = NULL;
+
+    UA_Server *mUaServer = UA_Server_new();
+    UA_ServerConfig *uaServerConfig = UA_Server_getConfig(mUaServer);
+
+    UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(uaServerConfig, 4840,
+                                                                          &c, &prvKey,
+                                                                          trustList, trustListSize,
+                                                                          issuerList, issuerListSize,
+                                                                          revocationList, revocationListSize);
+    if (!retval) {
+        HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+    }
+
+    //VERY IMPORTANT: Set the hostname with your IP before starting the server
+    UA_ServerConfig_setCustomHostname(uaServerConfig, UA_STRING("192.168.000.102"));
+
+    //The rest is the same as the example
+
+    UA_Boolean running = true;
+
+    // add a variable node to the adresspace
+    UA_VariableAttributes attr = UA_VariableAttributes_default;
+    UA_Int32 myInteger = 42;
+    UA_Variant_setScalarCopy(&attr.value, &myInteger, &UA_TYPES[UA_TYPES_INT32]);
+    attr.description = UA_LOCALIZEDTEXT_ALLOC("en-US", "the answer");
+    attr.displayName = UA_LOCALIZEDTEXT_ALLOC("en-US", "the answer");
+    UA_NodeId myIntegerNodeId = UA_NODEID_STRING_ALLOC(1, "the.answer");
+    UA_QualifiedName myIntegerName = UA_QUALIFIEDNAME_ALLOC(1, "the answer");
+    UA_NodeId parentNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+    UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
+    UA_Server_addVariableNode(mUaServer, myIntegerNodeId, parentNodeId,
+                              parentReferenceNodeId, myIntegerName,
+                              UA_NODEID_NULL, attr, NULL, NULL);
+
+    /* allocations on the heap need to be freed */
+    UA_VariableAttributes_clear(&attr);
+    UA_NodeId_clear(&myIntegerNodeId);
+    UA_QualifiedName_clear(&myIntegerName);
+
+    retval = UA_Server_run(mUaServer, &running);
+    UA_Server_delete(mUaServer);
+
   /* USER CODE END opcua_thread */
 }
 
