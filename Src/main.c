@@ -51,14 +51,14 @@ osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 128
+  .stack_size = 1500
 };
 /* Definitions for OPC_UA */
 osThreadId_t OPC_UAHandle;
 const osThreadAttr_t OPC_UA_attributes = {
   .name = "OPC_UA",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 32768
+  .stack_size = 16384
 };
 /* USER CODE BEGIN PV */
 
@@ -111,7 +111,7 @@ int main(void)
   /* Up to user define the empty MX_MBEDTLS_Init() function located in mbedtls.c file */
 
   /* USER CODE BEGIN 2 */
-
+    MX_MBEDTLS_Init();
   /* USER CODE END 2 */
   /* Init scheduler */
   osKernelInitialize();
@@ -294,12 +294,14 @@ void opcua_thread(void *argument)
 
     UA_Server *mUaServer = UA_Server_new();
     UA_ServerConfig *uaServerConfig = UA_Server_getConfig(mUaServer);
+    uaServerConfig->applicationDescription.applicationUri = UA_STRING_ALLOC("urn:eiti:pw:certificate");
 
     UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(uaServerConfig, 4840,
                                                                           &c, &prvKey,
                                                                           trustList, trustListSize,
                                                                           issuerList, issuerListSize,
                                                                           revocationList, revocationListSize);
+
     if (!retval) {
         HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
     }

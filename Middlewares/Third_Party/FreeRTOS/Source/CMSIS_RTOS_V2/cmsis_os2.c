@@ -1855,9 +1855,7 @@ __WEAK void vApplicationIdleHook (void){}
   Dummy implementation of the callback function vApplicationMallocFailedHook().
 */
 #if (configUSE_MALLOC_FAILED_HOOK == 1)
-__WEAK void vApplicationMallocFailedHook (void){
-    osDelay(1);
-}
+__WEAK void vApplicationMallocFailedHook (void){}
 #endif
 
 /**
@@ -1874,7 +1872,6 @@ __WEAK void vApplicationDaemonTaskStartupHook (void){}
 __WEAK void vApplicationStackOverflowHook (TaskHandle_t xTask, signed char *pcTaskName) {
   (void)xTask;
   (void)pcTaskName;
-  osDelay(1);
 }
 #endif
 

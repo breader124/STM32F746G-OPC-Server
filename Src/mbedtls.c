@@ -24,7 +24,7 @@
 #include "mbedtls.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "mbedtls/memory_buffer_alloc.h"
 /* USER CODE END 0 */
 
 /* USER CODE BEGIN 1 */
@@ -43,7 +43,8 @@ void MX_MBEDTLS_Init(void)
    /**
   */
   /* USER CODE BEGIN 3 */
-
+    unsigned char memory_buf[100000];
+    mbedtls_memory_buffer_alloc_init(memory_buf, sizeof(memory_buf));
   /* USER CODE END 3 */
 
 }
