@@ -55,6 +55,12 @@
 #define MEM_ALIGNMENT 4
 /*----- Default Value for MEM_SIZE: 1600 ---*/
 #define MEM_SIZE 40000
+/*----- Default Value for MEMP_NUM_NETBUF: 2 ---*/
+#define MEMP_NUM_NETBUF 8
+/*----- Default Value for MEMP_NUM_NETCONN: 4 ---*/
+#define MEMP_NUM_NETCONN 16
+/*----- Default Value for MEMP_NUM_NETDB: 1 ---*/
+#define MEMP_NUM_NETDB 2
 /*----- Value in opt.h for LWIP_ETHERNET: LWIP_ARP || PPPOE_SUPPORT -*/
 #define LWIP_ETHERNET 1
 /*----- Value in opt.h for LWIP_DNS_SECURE: (LWIP_DNS_SECURE_RAND_XID | LWIP_DNS_SECURE_NO_MULTIPLE_OUTSTANDING | LWIP_DNS_SECURE_RAND_SRC_PORT) -*/
