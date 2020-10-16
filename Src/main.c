@@ -58,7 +58,7 @@ osThreadId_t OPC_UAHandle;
 const osThreadAttr_t OPC_UA_attributes = {
   .name = "OPC_UA",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 16384
+  .stack_size = 25000
 };
 /* USER CODE BEGIN PV */
 
@@ -111,7 +111,8 @@ int main(void)
   /* Up to user define the empty MX_MBEDTLS_Init() function located in mbedtls.c file */
 
   /* USER CODE BEGIN 2 */
-    MX_MBEDTLS_Init();
+  MX_LWIP_Init();
+  MX_MBEDTLS_Init();
   /* USER CODE END 2 */
   /* Init scheduler */
   osKernelInitialize();
@@ -296,6 +297,7 @@ void opcua_thread(void *argument)
     UA_ServerConfig *uaServerConfig = UA_Server_getConfig(mUaServer);
     uaServerConfig->applicationDescription.applicationUri = UA_STRING_ALLOC("urn:eiti:pw:certificate");
 
+    UA_ServerConfig
     UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(uaServerConfig, 4840,
                                                                           &c, &prvKey,
                                                                           trustList, trustListSize,

@@ -26584,6 +26584,7 @@ UA_Server_run(UA_Server *server, const volatile UA_Boolean *running) {
             if(setServerShutdown(server))
                 break;
         }
+        HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
     }
     return UA_Server_run_shutdown(server);
 }
