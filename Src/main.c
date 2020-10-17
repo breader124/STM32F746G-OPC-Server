@@ -51,14 +51,14 @@ osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1500
+  .stack_size = 512
 };
 /* Definitions for OPC_UA */
 osThreadId_t OPC_UAHandle;
 const osThreadAttr_t OPC_UA_attributes = {
   .name = "OPC_UA",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 25000
+  .stack_size = 4096
 };
 /* USER CODE BEGIN PV */
 
@@ -295,9 +295,7 @@ void opcua_thread(void *argument)
 
     UA_Server *mUaServer = UA_Server_new();
     UA_ServerConfig *uaServerConfig = UA_Server_getConfig(mUaServer);
-    uaServerConfig->applicationDescription.applicationUri = UA_STRING_ALLOC("urn:eiti:pw:certificate");
 
-    UA_ServerConfig
     UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(uaServerConfig, 4840,
                                                                           &c, &prvKey,
                                                                           trustList, trustListSize,
