@@ -76,7 +76,7 @@
 /*----- Value in opt.h for TCPIP_THREAD_STACKSIZE: 0 -----*/
 #define TCPIP_THREAD_STACKSIZE 512
 /*----- Value in opt.h for TCPIP_THREAD_PRIO: 1 -----*/
-#define TCPIP_THREAD_PRIO 24
+#define TCPIP_THREAD_PRIO 49
 /*----- Value in opt.h for TCPIP_MBOX_SIZE: 0 -----*/
 #define TCPIP_MBOX_SIZE 6
 /*----- Value in opt.h for SLIPIF_THREAD_STACKSIZE: 0 -----*/
@@ -86,7 +86,7 @@
 /*----- Value in opt.h for DEFAULT_THREAD_STACKSIZE: 0 -----*/
 #define DEFAULT_THREAD_STACKSIZE 512
 /*----- Value in opt.h for DEFAULT_THREAD_PRIO: 1 -----*/
-#define DEFAULT_THREAD_PRIO 3
+#define DEFAULT_THREAD_PRIO 49
 /*----- Value in opt.h for DEFAULT_UDP_RECVMBOX_SIZE: 0 -----*/
 #define DEFAULT_UDP_RECVMBOX_SIZE 6
 /*----- Value in opt.h for DEFAULT_TCP_RECVMBOX_SIZE: 0 -----*/

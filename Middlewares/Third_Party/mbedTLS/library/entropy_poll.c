@@ -265,10 +265,8 @@ int mbedtls_nv_seed_poll( void *data,
     return( 0 );
 }
 #endif /* MBEDTLS_ENTROPY_NV_SEED */
-
 int mbedtls_hardware_poll( void *data,
                            unsigned char *output, size_t len, size_t *olen ) {
     return 0;
 }
-
 #endif /* MBEDTLS_ENTROPY_C */
