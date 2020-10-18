@@ -51846,7 +51846,8 @@ UA_Log_Stdout_log(void *context, UA_LogLevel level, UA_LogCategory category,
     printf("[%04u-%02u-%02u %02u:%02u:%02u.%03u (UTC%+05d)] %s/%s" ANSI_COLOR_RESET "\t",
            dts.year, dts.month, dts.day, dts.hour, dts.min, dts.sec, dts.milliSec,
            (int)(tOffset / UA_DATETIME_SEC / 36), logLevelNames[level], logCategoryNames[category]);
-    vprintf(msg, args);
+//    vprintf(msg, args);
+//    commented out live above as it causes problem running on embedded platform
     printf("\n");
     fflush(stdout);
 
