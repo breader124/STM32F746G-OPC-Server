@@ -290,8 +290,6 @@ void StartDefaultTask(void *argument)
 void opcua_thread(void *argument)
 {
   /* USER CODE BEGIN opcua_thread */
-    UA_UInt16 portNumber = 4840;
-
     UA_ByteString c = UA_STRING_NULL;
     c.data = certificate;
     c.length = cert_len;
@@ -320,22 +318,19 @@ void opcua_thread(void *argument)
                                                                           trustList, trustListSize,
                                                                           issuerList, issuerListSize,
                                                                           revocationList, revocationListSize);
-
     if (!retval) {
         HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
     }
 
-    //VERY IMPORTANT: Set the hostname with your IP before starting the server
     UA_ServerConfig_setCustomHostname(uaServerConfig, UA_STRING("192.168.000.102"));
-
-    //The rest is the same as the example
-
     UA_Boolean running = true;
 
-    // add a variable node to the adresspace
     addVariable(mUaServer);
 
+    // server should run in loop after invocation of function line below
     retval = UA_Server_run(mUaServer, &running);
+
+    // execution should never reach that point if everything works fine
     UA_Server_delete(mUaServer);
   /* USER CODE END opcua_thread */
 }
