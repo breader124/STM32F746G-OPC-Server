@@ -300,8 +300,11 @@ void opcua_thread(void *argument)
     prvKey.data = privateKey;
     prvKey.length = privateKey_len;
 
-    size_t trustListSize = 0;
-    UA_ByteString *trustList = NULL;
+    size_t trustListSize = 1;
+    UA_ByteString trustList[trustListSize];
+    trustList[0] = UA_STRING_NULL;
+    trustList[0].data = certificate;
+    trustList[0].length = cert_len;
 
     size_t issuerListSize = 0;
     UA_ByteString *issuerList = NULL;
