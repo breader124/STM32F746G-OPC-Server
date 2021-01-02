@@ -36,11 +36,8 @@
 void *pvPortCalloc(size_t count, size_t size)
 {
     void *p;
-
-    /* allocate 'count' objects of size 'size' */
     p = pvPortMalloc(count * size);
     if (p) {
-        /* zero the memory */
         memset(p, 0, count * size);
     }
     return p;

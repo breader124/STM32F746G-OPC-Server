@@ -705,10 +705,10 @@ netconn_alloc(enum netconn_type t, netconn_callback callback)
   conn->write_offset = 0;
 #endif /* LWIP_TCP */
 #if LWIP_SO_SNDTIMEO
-  conn->send_timeout = 100;
+  conn->send_timeout = 0;
 #endif /* LWIP_SO_SNDTIMEO */
 #if LWIP_SO_RCVTIMEO
-  conn->recv_timeout = 100;
+  conn->recv_timeout = 0;
 #endif /* LWIP_SO_RCVTIMEO */
 #if LWIP_SO_RCVBUF
   conn->recv_bufsize = RECV_BUFSIZE_DEFAULT;
