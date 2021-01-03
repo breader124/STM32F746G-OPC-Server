@@ -61,7 +61,9 @@ const osThreadAttr_t OPC_UA_attributes = {
   .stack_size = 4096
 };
 /* USER CODE BEGIN PV */
-
+UA_Server* mUaServer;
+UA_NodeId outputNodeId;
+UA_NodeId inputNodeId;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -237,25 +239,48 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+UA_Double
+computeOutput(UA_Double lastValue, UA_Double input) {
+    return 0.07165 * input + 0.9299 * lastValue;
+}
+
 static void
-addVariable(UA_Server *server) {
-    /* Define the attribute of the myInteger variable node */
+updateOutputCallback(UA_Server *server, void *data) {
+    UA_Variant processOutputVariant;
+    UA_Variant inputVariant;
+    UA_Server_readValue(server, outputNodeId, &processOutputVariant);
+    UA_Server_readValue(server, inputNodeId, &inputVariant);
+
+    UA_Double* processOutputValue = (UA_Double*) processOutputVariant.data;
+    UA_Double* inputValue = (UA_Double*) inputVariant.data;
+    UA_Double processOutput = computeOutput(*processOutputValue, *inputValue);
+
+    UA_Variant newValue;
+    UA_Variant_setScalar(&newValue, &processOutput, &UA_TYPES[UA_TYPES_DOUBLE]);
+    UA_Server_writeValue(server, outputNodeId, newValue);
+}
+
+static void
+addVariable(UA_Server *server, char *variableName, UA_Double initialValue) {
+    /* Define the attribute of the variable variable node */
     UA_VariableAttributes attr = UA_VariableAttributes_default;
-    UA_Int32 myInteger = 42;
-    UA_Variant_setScalar(&attr.value, &myInteger, &UA_TYPES[UA_TYPES_INT32]);
-    attr.description = UA_LOCALIZEDTEXT("en-US","the answer");
-    attr.displayName = UA_LOCALIZEDTEXT("en-US","the answer");
-    attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
+    UA_Double variable = initialValue;
+    UA_Variant_setScalar(&attr.value, &variable, &UA_TYPES[UA_TYPES_DOUBLE]);
+    attr.description = UA_LOCALIZEDTEXT("en-US", variableName);
+    attr.displayName = UA_LOCALIZEDTEXT("en-US", variableName);
+    attr.dataType = UA_TYPES[UA_TYPES_DOUBLE].typeId;
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
 
     /* Add the variable node to the information model */
-    UA_NodeId myIntegerNodeId = UA_NODEID_STRING(1, "the.answer");
-    UA_QualifiedName myIntegerName = UA_QUALIFIEDNAME(1, "the answer");
+    UA_NodeId variableNodeId = UA_NODEID_STRING(1, variableName);
+    UA_QualifiedName qualifiedVariableName = UA_QUALIFIEDNAME(1, variableName);
     UA_NodeId parentNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
     UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
-    UA_Server_addVariableNode(server, myIntegerNodeId, parentNodeId,
-                              parentReferenceNodeId, myIntegerName,
+    UA_Server_addVariableNode(server, variableNodeId, parentNodeId,
+                              parentReferenceNodeId, qualifiedVariableName,
                               UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, NULL, NULL);
+
+    return variableNodeId;
 }
 /* USER CODE END 4 */
 
@@ -307,7 +332,7 @@ void opcua_thread(void *argument)
     size_t revocationListSize = 0;
     UA_ByteString *revocationList = NULL;
 
-    UA_Server *mUaServer = UA_Server_new();
+    mUaServer = UA_Server_new();
     UA_ServerConfig *uaServerConfig = UA_Server_getConfig(mUaServer);
 
     UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(uaServerConfig, 4840,
@@ -315,6 +340,7 @@ void opcua_thread(void *argument)
                                                                           trustList, trustListSize,
                                                                           issuerList, issuerListSize,
                                                                           revocationList, revocationListSize);
+    UA_Server_addRepeatedCallback(mUaServer, updateOutputCallback, NULL, 1000, NULL);
     if (!retval) {
         HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
     }
@@ -322,7 +348,17 @@ void opcua_thread(void *argument)
     UA_ServerConfig_setCustomHostname(uaServerConfig, UA_STRING("192.168.000.102"));
     UA_Boolean running = true;
 
-    addVariable(mUaServer);
+    char* inputVariableName = "process-input";
+    char* outputVariableName = "process-output";
+    addVariable(mUaServer, inputVariableName, 0L);
+    addVariable(mUaServer, outputVariableName, 0L);
+    inputNodeId = UA_NODEID_STRING(1, inputVariableName);
+    outputNodeId = UA_NODEID_STRING(1, outputVariableName);
+//
+//    UA_ValueCallback callback;
+//    callback.onRead = beforeRead;
+//    callback.onWrite = afterWrite;
+//    UA_Server_setVariableNode_valueCallback(mUaServer, outputNodeId, callback);
 
     // server should run in loop after invocation of function line below
     retval = UA_Server_run(mUaServer, &running);
