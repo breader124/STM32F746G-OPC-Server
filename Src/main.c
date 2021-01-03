@@ -49,27 +49,30 @@
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 512
+        .name = "defaultTask",
+        .priority = (osPriority_t) osPriorityNormal,
+        .stack_size = 512
 };
 /* Definitions for OPC_UA */
 osThreadId_t OPC_UAHandle;
 const osThreadAttr_t OPC_UA_attributes = {
-  .name = "OPC_UA",
-  .priority = (osPriority_t) osPriorityRealtime,
-  .stack_size = 4096
+        .name = "OPC_UA",
+        .priority = (osPriority_t) osPriorityRealtime,
+        .stack_size = 4096
 };
 /* USER CODE BEGIN PV */
-UA_Server* mUaServer;
+UA_Server *mUaServer;
 UA_NodeId outputNodeId;
 UA_NodeId inputNodeId;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+
 static void MX_GPIO_Init(void);
+
 void StartDefaultTask(void *argument);
+
 void opcua_thread(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -85,129 +88,123 @@ void opcua_thread(void *argument);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
-{
-  /* USER CODE BEGIN 1 */
+int main(void) {
+    /* USER CODE BEGIN 1 */
 
-  /* USER CODE END 1 */
-  
+    /* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+    /* MCU Configuration--------------------------------------------------------*/
 
-  /* USER CODE BEGIN Init */
+    /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+    HAL_Init();
 
-  /* USER CODE END Init */
+    /* USER CODE BEGIN Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+    /* USER CODE END Init */
 
-  /* USER CODE BEGIN SysInit */
+    /* Configure the system clock */
+    SystemClock_Config();
 
-  /* USER CODE END SysInit */
+    /* USER CODE BEGIN SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  /* Up to user define the empty MX_MBEDTLS_Init() function located in mbedtls.c file */
+    /* USER CODE END SysInit */
 
-  /* USER CODE BEGIN 2 */
-  MX_LWIP_Init();
-  MX_MBEDTLS_Init();
-  /* USER CODE END 2 */
-  /* Init scheduler */
-  osKernelInitialize();
+    /* Initialize all configured peripherals */
+    MX_GPIO_Init();
+    /* Up to user define the empty MX_MBEDTLS_Init() function located in mbedtls.c file */
 
-  /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
+    /* USER CODE BEGIN 2 */
+    MX_LWIP_Init();
+    MX_MBEDTLS_Init();
+    /* USER CODE END 2 */
+    /* Init scheduler */
+    osKernelInitialize();
 
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
+    /* USER CODE BEGIN RTOS_MUTEX */
+    /* add mutexes, ... */
+    /* USER CODE END RTOS_MUTEX */
 
-  /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
+    /* USER CODE BEGIN RTOS_SEMAPHORES */
+    /* add semaphores, ... */
+    /* USER CODE END RTOS_SEMAPHORES */
 
-  /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
+    /* USER CODE BEGIN RTOS_TIMERS */
+    /* start timers, add new ones, ... */
+    /* USER CODE END RTOS_TIMERS */
 
-  /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+    /* USER CODE BEGIN RTOS_QUEUES */
+    /* add queues, ... */
+    /* USER CODE END RTOS_QUEUES */
 
-  /* creation of OPC_UA */
-  OPC_UAHandle = osThreadNew(opcua_thread, NULL, &OPC_UA_attributes);
+    /* Create the thread(s) */
+    /* creation of defaultTask */
+    defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
-  /* USER CODE END RTOS_THREADS */
+    /* creation of OPC_UA */
+    OPC_UAHandle = osThreadNew(opcua_thread, NULL, &OPC_UA_attributes);
 
-  /* Start scheduler */
-  osKernelStart();
- 
-  /* We should never get here as control is now taken by the scheduler */
+    /* USER CODE BEGIN RTOS_THREADS */
+    /* add threads, ... */
+    /* USER CODE END RTOS_THREADS */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
+    /* Start scheduler */
+    osKernelStart();
 
-    /* USER CODE BEGIN 3 */
-  }
-  /* USER CODE END 3 */
+    /* We should never get here as control is now taken by the scheduler */
+
+    /* Infinite loop */
+    /* USER CODE BEGIN WHILE */
+    while (1) {
+        /* USER CODE END WHILE */
+
+        /* USER CODE BEGIN 3 */
+    }
+    /* USER CODE END 3 */
 }
 
 /**
   * @brief System Clock Configuration
   * @retval None
   */
-void SystemClock_Config(void)
-{
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+void SystemClock_Config(void) {
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Configure the main internal regulator output voltage 
-  */
-  __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
-  /** Initializes the CPU, AHB and APB busses clocks 
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 25;
-  RCC_OscInitStruct.PLL.PLLN = 432;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 2;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Activate the Over-Drive mode 
-  */
-  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Initializes the CPU, AHB and APB busses clocks 
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+    /** Configure the main internal regulator output voltage
+    */
+    __HAL_RCC_PWR_CLK_ENABLE();
+    __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+    /** Initializes the CPU, AHB and APB busses clocks
+    */
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+    RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+    RCC_OscInitStruct.PLL.PLLM = 25;
+    RCC_OscInitStruct.PLL.PLLN = 432;
+    RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+    RCC_OscInitStruct.PLL.PLLQ = 2;
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+        Error_Handler();
+    }
+    /** Activate the Over-Drive mode
+    */
+    if (HAL_PWREx_EnableOverDrive() != HAL_OK) {
+        Error_Handler();
+    }
+    /** Initializes the CPU, AHB and APB busses clocks
+    */
+    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+                                  | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+    RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+    RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+    RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK)
-  {
-    Error_Handler();
-  }
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK) {
+        Error_Handler();
+    }
 }
 
 /**
@@ -215,26 +212,25 @@ void SystemClock_Config(void)
   * @param None
   * @retval None
   */
-static void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
+static void MX_GPIO_Init(void) {
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOG_CLK_ENABLE();
-  __HAL_RCC_GPIOI_CLK_ENABLE();
-  __HAL_RCC_GPIOH_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
+    /* GPIO Ports Clock Enable */
+    __HAL_RCC_GPIOG_CLK_ENABLE();
+    __HAL_RCC_GPIOI_CLK_ENABLE();
+    __HAL_RCC_GPIOH_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOA_CLK_ENABLE();
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : LED_Pin */
-  GPIO_InitStruct.Pin = LED_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
+    /*Configure GPIO pin : LED_Pin */
+    GPIO_InitStruct.Pin = LED_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
 }
 
@@ -251,8 +247,8 @@ updateOutputCallback(UA_Server *server, void *data) {
     UA_Server_readValue(server, outputNodeId, &processOutputVariant);
     UA_Server_readValue(server, inputNodeId, &inputVariant);
 
-    UA_Double* processOutputValue = (UA_Double*) processOutputVariant.data;
-    UA_Double* inputValue = (UA_Double*) inputVariant.data;
+    UA_Double *processOutputValue = (UA_Double *) processOutputVariant.data;
+    UA_Double *inputValue = (UA_Double *) inputVariant.data;
     UA_Double processOutput = computeOutput(*processOutputValue, *inputValue);
 
     UA_Variant newValue;
@@ -262,7 +258,6 @@ updateOutputCallback(UA_Server *server, void *data) {
 
 static void
 addVariable(UA_Server *server, char *variableName, UA_Double initialValue) {
-    /* Define the attribute of the variable variable node */
     UA_VariableAttributes attr = UA_VariableAttributes_default;
     UA_Double variable = initialValue;
     UA_Variant_setScalar(&attr.value, &variable, &UA_TYPES[UA_TYPES_DOUBLE]);
@@ -291,15 +286,13 @@ addVariable(UA_Server *server, char *variableName, UA_Double initialValue) {
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
-{
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END 5 */ 
+void StartDefaultTask(void *argument) {
+    /* USER CODE BEGIN 5 */
+    /* Infinite loop */
+    for (;;) {
+        osDelay(1);
+    }
+    /* USER CODE END 5 */
 }
 
 /* USER CODE BEGIN Header_opcua_thread */
@@ -309,9 +302,8 @@ void StartDefaultTask(void *argument)
 * @retval None
 */
 /* USER CODE END Header_opcua_thread */
-void opcua_thread(void *argument)
-{
-  /* USER CODE BEGIN opcua_thread */
+void opcua_thread(void *argument) {
+    /* USER CODE BEGIN opcua_thread */
     UA_ByteString c = UA_STRING_NULL;
     c.data = certificate;
     c.length = cert_len;
@@ -328,19 +320,19 @@ void opcua_thread(void *argument)
 
     size_t issuerListSize = 0;
     UA_ByteString *issuerList = NULL;
-
     size_t revocationListSize = 0;
     UA_ByteString *revocationList = NULL;
 
     mUaServer = UA_Server_new();
     UA_ServerConfig *uaServerConfig = UA_Server_getConfig(mUaServer);
 
-    UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(uaServerConfig, 4840,
-                                                                          &c, &prvKey,
-                                                                          trustList, trustListSize,
-                                                                          issuerList, issuerListSize,
-                                                                          revocationList, revocationListSize);
-    UA_Server_addRepeatedCallback(mUaServer, updateOutputCallback, NULL, 1000, NULL);
+    UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(
+        uaServerConfig, 4840,
+        &c, &prvKey,
+        trustList, trustListSize,
+        issuerList, issuerListSize,
+        revocationList, revocationListSize
+    );
     if (!retval) {
         HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
     }
@@ -348,24 +340,20 @@ void opcua_thread(void *argument)
     UA_ServerConfig_setCustomHostname(uaServerConfig, UA_STRING("192.168.000.102"));
     UA_Boolean running = true;
 
-    char* inputVariableName = "process-input";
-    char* outputVariableName = "process-output";
+    char *inputVariableName = "process-input";
+    char *outputVariableName = "process-output";
     addVariable(mUaServer, inputVariableName, 0L);
     addVariable(mUaServer, outputVariableName, 0L);
     inputNodeId = UA_NODEID_STRING(1, inputVariableName);
     outputNodeId = UA_NODEID_STRING(1, outputVariableName);
-//
-//    UA_ValueCallback callback;
-//    callback.onRead = beforeRead;
-//    callback.onWrite = afterWrite;
-//    UA_Server_setVariableNode_valueCallback(mUaServer, outputNodeId, callback);
+    UA_Server_addRepeatedCallback(mUaServer, updateOutputCallback, NULL, 1000, NULL);
 
     // server should run in loop after invocation of function line below
     retval = UA_Server_run(mUaServer, &running);
 
     // execution should never reach that point if everything works fine
     UA_Server_delete(mUaServer);
-  /* USER CODE END opcua_thread */
+    /* USER CODE END opcua_thread */
 }
 
 /**
@@ -376,29 +364,27 @@ void opcua_thread(void *argument)
   * @param  htim : TIM handle
   * @retval None
   */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  /* USER CODE BEGIN Callback 0 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+    /* USER CODE BEGIN Callback 0 */
 
-  /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM1) {
-    HAL_IncTick();
-  }
-  /* USER CODE BEGIN Callback 1 */
+    /* USER CODE END Callback 0 */
+    if (htim->Instance == TIM1) {
+        HAL_IncTick();
+    }
+    /* USER CODE BEGIN Callback 1 */
 
-  /* USER CODE END Callback 1 */
+    /* USER CODE END Callback 1 */
 }
 
 /**
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
+void Error_Handler(void) {
+    /* USER CODE BEGIN Error_Handler_Debug */
+    /* User can add his own implementation to report the HAL error return state */
 
-  /* USER CODE END Error_Handler_Debug */
+    /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT
