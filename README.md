@@ -1,0 +1,1 @@
+OPC UA server implemented on SMT32 microcontroller for the purpose of Bachelor's Thesis. Technological stack consists of FreeRTOS, lwip and mbedtls. OPC UA protocol is handled by open62541 open source library.
